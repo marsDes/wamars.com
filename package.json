@@ -1,7 +1,7 @@
 {
-  "name": "mars's home",
+  "name": "wamars",
   "version": "1.0.0",
-  "description": "mars home",
+  "description": "mars",
   "main": "app.js",
   "dependencies": {
     "koa": "^2.4.1"
@@ -9,6 +9,10 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marsDes/wamars.com.git"
   },
   "author": "mars",
   "license": "MIT"
