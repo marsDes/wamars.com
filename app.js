@@ -1,4 +1,6 @@
 const Koa = require('koa');
+const bodyParser = require('koa-bodyparser');
+const router = require('koa-router')();
 const app = new Koa();
 const WebSocket = require('ws');
 // x-response-time
@@ -39,11 +41,12 @@ router.get('/', async (ctx, next) => {
     </body>
     </html>`;
 });
-const WebSocketServer = WebSocket.Server;
 
+app.use(router.routes());
 let server = app.listen(80);
 
 // 创建WebSocketServer:
+const WebSocketServer = WebSocket.Server;
 let wss = new WebSocketServer({
     server: server
 });
