@@ -50,23 +50,23 @@ app.use(router.routes());
 let server = app.listen(80);
 
 // 创建WebSocketServer:
-const WebSocketServer = WebSocket.Server;
-let wss = new WebSocketServer({
-    server: server
-});
-wss.broadcast = function (data) {
-    wss.clients.forEach(function (client) {
-        client.send(data,err=>{
-            if(err){console.log(`[server] error: ${err}`)}
-        });
-    });
-};
-wss.on('connection', function (ws) {
-    console.log(`[SERVER] connection()`);
-    ws.on('message', function (message) {
-        if(message && message.trim()){
-            console.log(`[SERVER] Received: ${message}`);
-            wss.broadcast(message)
-        }
-    })
-});
+// const WebSocketServer = WebSocket.Server;
+// let wss = new WebSocketServer({
+//     server: server
+// });
+// wss.broadcast = function (data) {
+//     wss.clients.forEach(function (client) {
+//         client.send(data,err=>{
+//             if(err){console.log(`[server] error: ${err}`)}
+//         });
+//     });
+// };
+// wss.on('connection', function (ws) {
+//     console.log(`[SERVER] connection()`);
+//     ws.on('message', function (message) {
+//         if(message && message.trim()){
+//             console.log(`[SERVER] Received: ${message}`);
+//             wss.broadcast(message)
+//         }
+//     })
+// });
