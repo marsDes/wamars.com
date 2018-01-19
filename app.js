@@ -1,8 +1,14 @@
 const Koa = require('koa');
+const bodyParser = require('koa-bodyparser');
+const router = require('koa-router')();
 const app = new Koa();
+const WebSocket = require('ws');
+// 静态资源服务器
+// const serve = require('koa-static');
+// app.use(serve(__dirname+ "/static/html",{ extensions: ['html','png']}));
+// app.listen(3000);
 
 // x-response-time
-
 app.use(async (ctx, next) => {
   const start = Date.now();
   await next();
@@ -11,7 +17,6 @@ app.use(async (ctx, next) => {
 });
 
 // logger
-
 app.use(async (ctx, next) => {
   const start = Date.now();
   await next();
@@ -19,10 +24,43 @@ app.use(async (ctx, next) => {
   console.log(`${ctx.method} ${ctx.url} - ${ms}`);
 });
 
-// response
-
-app.use(async ctx => {
-  ctx.body = 'Hello Mars';
+// add url-route:
+router.get('/hello/:name', async (ctx, next) => {
+    var name = ctx.params.name;
+    ctx.response.body = `<h1>Hello, ${name}!</h1>`;
 });
 
-app.listen(80);
+router.get('/', async (ctx, next) => {
+  ctx.response.body = `<!DOCTYPE html>
+    <html>
+    <head>
+      <title>哇~ Mars</title>
+      <meta name="description" content="林建歆前端实验室">
+    </head>
+    <body>
+      <h1>
+        Hello Mars
+      </h1>
+    </body>
+    </html>`;
+});
+
+app.use(router.routes());
+let server = app.listen(80);
+
+// 创建WebSocketServer:
+const WebSocketServer = WebSocket.Server;
+let wss = new WebSocketServer({
+    server: server
+});
+wss.on('connection', function (ws) {
+    console.log(`[SERVER] connection()`);
+    ws.on('message', function (message) {
+        console.log(`[SERVER] Received: ${message}`);
+        ws.send(message, (err) => {
+            if (err) {
+                console.log(`[SERVER] error: ${err}`);
+            }
+        });
+    })
+});
