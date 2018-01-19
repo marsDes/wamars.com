@@ -44,6 +44,7 @@ router.get('/', async (ctx, next) => {
     </body>
     </html>`;
 });
+app.use(bodyParser());
 
 app.use(router.routes());
 let server = app.listen(80);
@@ -53,14 +54,19 @@ const WebSocketServer = WebSocket.Server;
 let wss = new WebSocketServer({
     server: server
 });
+wss.broadcast = function (data) {
+    wss.clients.forEach(function (client) {
+        client.send(data,err=>{
+            if(err){console.log(`[server] error: ${err}`)}
+        });
+    });
+};
 wss.on('connection', function (ws) {
     console.log(`[SERVER] connection()`);
     ws.on('message', function (message) {
-        console.log(`[SERVER] Received: ${message}`);
-        ws.send(message, (err) => {
-            if (err) {
-                console.log(`[SERVER] error: ${err}`);
-            }
-        });
+        if(message && message.trim()){
+            console.log(`[SERVER] Received: ${message}`);
+            wss.broadcast(message)
+        }
     })
 });
