@@ -48,14 +48,14 @@ router.get('/', async (ctx, next) => {
     </html>`;
 });
 app.use(bodyParser());
+app.use(router.routes());
 
 const options = {
     key: fs.readFileSync('./ssl/private.key', 'utf8'),
     cert: fs.readFileSync('./ssl/private.pem', 'utf8')
 }
-app.use(router.routes());
 
-http.createServer(app.callback()).listen(8989);
+http.createServer(app.callback()).listen(80);
 https.createServer(options, app.callback()).listen(443);
 
 //let server = app.listen(80);
