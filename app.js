@@ -1,3 +1,6 @@
+const http = require('http');
+const https = require('https');
+const fs = require("fs")
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const router = require('koa-router')();
@@ -46,8 +49,16 @@ router.get('/', async (ctx, next) => {
 });
 app.use(bodyParser());
 
+const options = {
+    key: fs.readFileSync('./ssl/private.key', 'utf8'),
+    cert: fs.readFileSync('./ssl/private.pem', 'utf8')
+}
 app.use(router.routes());
-let server = app.listen(80);
+
+http.createServer(app.callback()).listen(8989);
+https.createServer(options, app.callback()).listen(443);
+
+//let server = app.listen(80);
 
 // 创建WebSocketServer:
 // const WebSocketServer = WebSocket.Server;
