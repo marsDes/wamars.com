@@ -6,25 +6,53 @@ const bodyParser = require('koa-bodyparser');
 const router = require('koa-router')();
 const app = new Koa();
 const WebSocket = require('ws');
-// 静态资源服务器
-// const serve = require('koa-static');
-// app.use(serve(__dirname+ "/static/html",{ extensions: ['html','png']}));
-// app.listen(3000);
+const mongoose = require('mongoose');
+
+
+mongoose.connect('mongodb://');
+
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+    console.log('open MongoDB')
+    // yay!
+});
+var impressionSchema = mongoose.Schema({
+    name: { type: String },
+});
+var impressionModel = mongoose.model('wamars', impressionSchema);
+
+impressionModel.find((err, docs) => {
+    if (err) return console.log(err)
+    console.log(docs)
+})
+
+const marss = async (name) => {
+    console.log('marss name',name)
+    var re = new RegExp("^"+name);
+    console.log(re)
+    const query = impressionModel.find({ name: re })
+    console.log(typeof query.exec)
+    let reslist = null;
+    reslist = await query.exec()
+    return reslist
+}
 
 // x-response-time
 app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  ctx.set('X-Response-Time', `${ms}ms`);
+    const start = Date.now();
+    await next();
+    const ms = Date.now() - start;
+    ctx.set('X-Response-Time', `${ms}ms`);
 });
 
 // logger
 app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  console.log(`${ctx.method} ${ctx.url} - ${ms}`);
+    const start = Date.now();
+    await next();
+    const ms = Date.now() - start;
+    console.log(`${ctx.method} ${ctx.url} - ${ms}`);
 });
 
 // add url-route:
@@ -34,7 +62,7 @@ router.get('/hello/:name', async (ctx, next) => {
 });
 
 router.get('/', async (ctx, next) => {
-  ctx.response.body = `<!DOCTYPE html>
+    ctx.response.body = `<!DOCTYPE html>
     <html>
     <head>
       <title>哇~ Mars</title>
@@ -47,6 +75,20 @@ router.get('/', async (ctx, next) => {
     </body>
     </html>`;
 });
+
+router.post('/api/key', async (ctx, next) => {
+    console.log(ctx.request)
+    console.log(ctx.request.body,'body')
+
+    var name = ctx.params.name;
+
+    var data = await marss(ctx.request.body.name)
+    console.log(data, '444444')
+    ctx.response.body = {
+        success: true,
+        data,
+    };
+});
 app.use(bodyParser());
 app.use(router.routes());
 
@@ -57,27 +99,3 @@ const options = {
 
 http.createServer(app.callback()).listen(80);
 https.createServer(options, app.callback()).listen(443);
-
-//let server = app.listen(80);
-
-// 创建WebSocketServer:
-// const WebSocketServer = WebSocket.Server;
-// let wss = new WebSocketServer({
-//     server: server
-// });
-// wss.broadcast = function (data) {
-//     wss.clients.forEach(function (client) {
-//         client.send(data,err=>{
-//             if(err){console.log(`[server] error: ${err}`)}
-//         });
-//     });
-// };
-// wss.on('connection', function (ws) {
-//     console.log(`[SERVER] connection()`);
-//     ws.on('message', function (message) {
-//         if(message && message.trim()){
-//             console.log(`[SERVER] Received: ${message}`);
-//             wss.broadcast(message)
-//         }
-//     })
-// });
