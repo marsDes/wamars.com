@@ -9,7 +9,7 @@ const WebSocket = require('ws');
 const mongoose = require('mongoose');
 
 
-mongoose.connect('mongodb://');
+mongoose.connect('mongodb://localhost/wamars');
 
 
 var db = mongoose.connection;
@@ -20,12 +20,25 @@ db.once('open', function (callback) {
 });
 var impressionSchema = mongoose.Schema({
     name: { type: String },
+    age:{type:Number},
 });
-var impressionModel = mongoose.model('wamars', impressionSchema);
-
+var impressionModel = mongoose.model('aaa', impressionSchema);
+impressionModel.create([
+        {
+            name: 'marsaaaa',
+            age:311
+        }
+    ],(err,doc)=>{
+        if(err){
+            console.error(err);
+        } else {
+            console.log(["SUCCESS"]);
+            console.log(doc);
+        }
+    })
 impressionModel.find((err, docs) => {
     if (err) return console.log(err)
-    console.log(docs)
+    console.log(docs,'sss')
 })
 
 const marss = async (name) => {
@@ -77,8 +90,8 @@ router.get('/', async (ctx, next) => {
 });
 
 router.post('/api/key', async (ctx, next) => {
-    console.log(ctx.request)
-    console.log(ctx.request.body,'body')
+    // console.log(ctx.request)
+    // console.log(ctx.request.body,'body')
 
     var name = ctx.params.name;
 
@@ -97,5 +110,5 @@ const options = {
     cert: fs.readFileSync('./ssl/private.pem', 'utf8')
 }
 
-http.createServer(app.callback()).listen(80);
-https.createServer(options, app.callback()).listen(443);
+http.createServer(app.callback()).listen(8989);
+// https.createServer(options, app.callback()).listen(443);
